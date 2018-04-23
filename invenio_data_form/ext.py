@@ -34,26 +34,56 @@ from .indexer import index_versioned_record_siblings, indexer_receiver
 from .receivers import datacite_register_after_publish, \
     openaire_direct_index_after_publish, sipstore_write_files_after_publish
 
-class ZenodoDeposit(object):
-    """Zenodo deposit extension."""
+class InvenioDataForm(object):
+    """Invenio-Data-Form extension."""
 
     def __init__(self, app=None):
         """Extension initialization."""
+        # TODO: This is an example of translation string with comment. Please
+        # remove it.
+        # NOTE: This is a note to a translator.
+        _('A translation string')
         if app:
             self.init_app(app)
-        self.register_signals(app)
 
     def init_app(self, app):
         """Flask application initialization."""
         self.init_config(app)
+        app.register_blueprint(blueprint)
+        app.extensions['invenio-data-form'] = self
 
-        @app.before_first_request
-        def deposit_redirect():
-            from .views import legacy_index, new
-            app.view_functions['invenio_deposit_ui.index'] = legacy_index
-            app.view_functions['invenio_deposit_ui.new'] = new
+    def init_config(self, app):
+        """Initialize configuration."""
+        # Use theme's base template if theme is installed
+        if 'BASE_TEMPLATE' in app.config:
+            app.config.setdefault(
+                'DATA_FORM_BASE_TEMPLATE',
+                app.config['BASE_TEMPLATE'],
+            )
+        for k in dir(config):
+            if k.startswith('DATA_FORM_'):
+                app.config.setdefault(k, getattr(config, k))
+                
+# class ZenodoDeposit(object):
+#     """Zenodo deposit extension."""
 
-        app.extensions['zenodo-deposit'] = self
+#     def __init__(self, app=None):
+#         """Extension initialization."""
+#         if app:
+#             self.init_app(app)
+#         self.register_signals(app)
+
+#     def init_app(self, app):
+#         """Flask application initialization."""
+#         self.init_config(app)
+
+#         @app.before_first_request
+#         def deposit_redirect():
+#             from .views import legacy_index, new
+#             app.view_functions['invenio_deposit_ui.index'] = legacy_index
+#             app.view_functions['invenio_deposit_ui.new'] = new
+
+#         app.extensions['zenodo-deposit'] = self
 
     # @staticmethod
     # def register_signals(app):
