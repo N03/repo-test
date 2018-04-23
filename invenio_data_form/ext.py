@@ -34,7 +34,6 @@ from .indexer import index_versioned_record_siblings, indexer_receiver
 from .receivers import datacite_register_after_publish, \
     openaire_direct_index_after_publish, sipstore_write_files_after_publish
 
-
 class ZenodoDeposit(object):
     """Zenodo deposit extension."""
 
