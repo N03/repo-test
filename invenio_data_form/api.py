@@ -73,7 +73,7 @@ PRESERVE_FIELDS = (
 """Fields which will not be overwritten on edit."""
 
 
-class ZenodoDeposit(Deposit):
+class ZenodoDeposit():
     """Define API for changing deposit state."""
     pass
 
