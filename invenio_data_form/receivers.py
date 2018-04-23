@@ -27,7 +27,7 @@
 from __future__ import absolute_import, print_function
 
 from flask import current_app
-from invenio_sipstore.models import RecordSIP
+# from invenio_sipstore.models import RecordSIP
 
 from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.openaire.tasks import openaire_direct_index
@@ -55,13 +55,14 @@ def openaire_direct_index_after_publish(sender, action=None, pid=None,
 def sipstore_write_files_after_publish(sender, action=None, pid=None,
                                        deposit=None):
     """Send the SIP for archiving."""
-    if action == 'publish' and \
-            current_app.config['SIPSTORE_ARCHIVER_WRITING_ENABLED']:
-        recid_pid, record = deposit.fetch_published()
-        sip = (
-            RecordSIP.query
-            .filter_by(pid_id=recid_pid.id)
-            .order_by(RecordSIP.created.desc())
-            .first().sip
-        )
-        archive_sip.delay(str(sip.id))
+    pass
+    # if action == 'publish' and \
+    #         current_app.config['SIPSTORE_ARCHIVER_WRITING_ENABLED']:
+    #     recid_pid, record = deposit.fetch_published()
+    #     sip = (
+    #         RecordSIP.query
+    #         .filter_by(pid_id=recid_pid.id)
+    #         .order_by(RecordSIP.created.desc())
+    #         .first().sip
+    #     )
+    #     archive_sip.delay(str(sip.id))
