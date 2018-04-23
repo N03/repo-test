@@ -26,8 +26,8 @@
 
 from __future__ import absolute_import, print_function
 
-from invenio_deposit.signals import post_action
-from invenio_indexer.signals import before_record_index
+# from invenio_deposit.signals import post_action
+# from invenio_indexer.signals import before_record_index
 
 from . import config
 from .indexer import index_versioned_record_siblings, indexer_receiver
@@ -56,18 +56,18 @@ class ZenodoDeposit(object):
 
         app.extensions['zenodo-deposit'] = self
 
-    @staticmethod
-    def register_signals(app):
-        """Register Zenodo Deposit signals."""
-        before_record_index.connect(indexer_receiver, sender=app, weak=False)
-        post_action.connect(datacite_register_after_publish, sender=app,
-                            weak=False)
-        post_action.connect(index_versioned_record_siblings, sender=app,
-                            weak=False)
-        post_action.connect(openaire_direct_index_after_publish, sender=app,
-                            weak=False)
-        post_action.connect(sipstore_write_files_after_publish, sender=app,
-                            weak=False)
+    # @staticmethod
+    # def register_signals(app):
+    #     """Register Zenodo Deposit signals."""
+    #     before_record_index.connect(indexer_receiver, sender=app, weak=False)
+    #     post_action.connect(datacite_register_after_publish, sender=app,
+    #                         weak=False)
+    #     post_action.connect(index_versioned_record_siblings, sender=app,
+    #                         weak=False)
+    #     post_action.connect(openaire_direct_index_after_publish, sender=app,
+    #                         weak=False)
+    #     post_action.connect(sipstore_write_files_after_publish, sender=app,
+    #                         weak=False)
 
     @staticmethod
     def init_config(app):
