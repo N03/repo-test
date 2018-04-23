@@ -42,7 +42,7 @@ class InvenioDataForm(object):
         # TODO: This is an example of translation string with comment. Please
         # remove it.
         # NOTE: This is a note to a translator.
-        _('A translation string')
+        # _('A translation string')
         if app:
             self.init_app(app)
 
