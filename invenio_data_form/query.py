@@ -22,6 +22,19 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Zenodo deposit additions."""
+"""Query factories for deposit REST API."""
 
-from __future__ import absolute_import, print_function
+
+from flask import abort
+from flask_security import current_user
+
+from zenodo.modules.records.query import \
+    search_factory as record_search_factory
+
+
+def search_factory(*args, **kwargs):
+    """Check user is logged in and then parse."""
+    if not current_user.is_authenticated:
+        abort(401)
+
+    return record_search_factory(*args, **kwargs)

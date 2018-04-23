@@ -22,6 +22,18 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Zenodo deposit additions."""
+"""Persistent identifier fetchers."""
 
 from __future__ import absolute_import, print_function
+
+from invenio_pidstore.fetchers import FetchedPID
+
+
+def zenodo_deposit_fetcher(record_uuid, data):
+    """Fetch a deposit identifier."""
+    pid_value = data.get('_deposit', {}).get('id')
+    return FetchedPID(
+        provider=None,
+        pid_type='depid',
+        pid_value=pid_value,
+    ) if pid_value else None
