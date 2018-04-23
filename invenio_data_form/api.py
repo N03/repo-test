@@ -30,7 +30,7 @@ from contextlib import contextmanager
 from copy import copy
 
 from flask import current_app
-from invenio_communities.models import Community, InclusionRequest
+# from invenio_communities.models import Community, InclusionRequest
 from invenio_db import db
 from invenio_deposit.api import Deposit, index, preserve
 from invenio_deposit.utils import mark_as_action
