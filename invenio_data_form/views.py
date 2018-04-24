@@ -42,9 +42,9 @@ from invenio_pidstore.models import PersistentIdentifier
 from invenio_pidstore.resolver import Resolver
 from invenio_records_ui.signals import record_viewed
 
-from zenodo.modules.deposit.utils import delete_record
-from zenodo.modules.openaire import current_openaire
-from zenodo.modules.records.permissions import record_permission_factory
+# from zenodo.modules.deposit.utils import delete_record
+# from zenodo.modules.openaire import current_openaire
+# from zenodo.modules.records.permissions import record_permission_factory
 
 from .api import ZenodoDeposit
 from .fetchers import zenodo_deposit_fetcher
@@ -78,10 +78,10 @@ def pass_record(action, deposit_cls=ZenodoDeposit):
             pid, record = pid_value.data
 
             # Check permissions.
-            permission = record_permission_factory(
-                record=record, action=action)
-            if not permission.can():
-                abort(403)
+            # permission = record_permission_factory(
+            #     record=record, action=action)
+            # if not permission.can():
+            #     abort(403)
 
             # Fetch deposit id from record and resolve deposit record and pid.
             depid = zenodo_deposit_fetcher(None, record)
@@ -199,51 +199,52 @@ def registerconceptdoi(pid=None, record=None, depid=None, deposit=None):
 @login_required
 @pass_record('delete')
 def delete(pid=None, record=None, depid=None, deposit=None):
-    """Delete a record."""
-    # View disabled until properly implemented and tested.
-    try:
-        doi = PersistentIdentifier.get('doi', record['doi'])
-    except PIDDoesNotExistError:
-        doi = None
+    pass
+    # """Delete a record."""
+    # # View disabled until properly implemented and tested.
+    # try:
+    #     doi = PersistentIdentifier.get('doi', record['doi'])
+    # except PIDDoesNotExistError:
+    #     doi = None
 
-    owners = User.query.filter(User.id.in_(record.get('owners', []))).all()
+    # owners = User.query.filter(User.id.in_(record.get('owners', []))).all()
 
-    pids = [pid, depid, doi]
-    if 'conceptdoi' in record:
-        conceptdoi = PersistentIdentifier.get('doi', record['conceptdoi'])
-        pids.append(conceptdoi)
-    else:
-        conceptdoi = None
+    # pids = [pid, depid, doi]
+    # if 'conceptdoi' in record:
+    #     conceptdoi = PersistentIdentifier.get('doi', record['conceptdoi'])
+    #     pids.append(conceptdoi)
+    # else:
+    #     conceptdoi = None
 
-    if 'conceptrecid' in record:
-        conceptrecid = PersistentIdentifier.get('recid',
-                                                record['conceptrecid'])
-        pids.append(conceptrecid)
-    else:
-        conceptrecid = None
+    # if 'conceptrecid' in record:
+    #     conceptrecid = PersistentIdentifier.get('recid',
+    #                                             record['conceptrecid'])
+    #     pids.append(conceptrecid)
+    # else:
+    #     conceptrecid = None
 
-    form = RecordDeleteForm()
-    form.standard_reason.choices = current_app.config['ZENODO_REMOVAL_REASONS']
-    if form.validate_on_submit():
-        reason = form.reason.data or dict(
-            current_app.config['ZENODO_REMOVAL_REASONS']
-        )[form.standard_reason.data]
-        delete_record(record.id, reason, int(current_user.get_id()))
-        flash(
-            _('Record %(recid)s and associated objects successfully deleted.',
-                recid=pid.pid_value),
-            category='success'
-        )
-        return redirect(url_for('zenodo_frontpage.index'))
-    return render_template(
-        'zenodo_deposit/delete.html',
-        form=form,
-        owners=owners,
-        pid=pid,
-        pids=pids,
-        record=record,
-        deposit=deposit,
-    )
+    # form = RecordDeleteForm()
+    # form.standard_reason.choices = current_app.config['ZENODO_REMOVAL_REASONS']
+    # if form.validate_on_submit():
+    #     reason = form.reason.data or dict(
+    #         current_app.config['ZENODO_REMOVAL_REASONS']
+    #     )[form.standard_reason.data]
+    #     delete_record(record.id, reason, int(current_user.get_id()))
+    #     flash(
+    #         _('Record %(recid)s and associated objects successfully deleted.',
+    #             recid=pid.pid_value),
+    #         category='success'
+    #     )
+    #     return redirect(url_for('zenodo_frontpage.index'))
+    # return render_template(
+    #     'zenodo_deposit/delete.html',
+    #     form=form,
+    #     owners=owners,
+    #     pid=pid,
+    #     pids=pids,
+    #     record=record,
+    #     deposit=deposit,
+    # )
 
 
 @blueprint.app_context_processor
@@ -260,7 +261,8 @@ def current_datetime():
 @blueprint.app_context_processor
 def current_openaire_ctx():
     """Current OpenAIRE context."""
-    return dict(current_openaire=current_openaire)
+    # return dict(current_openaire=current_openaire)
+    pass
 
 
 @blueprint.app_template_filter('tolinksjs')
