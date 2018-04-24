@@ -36,13 +36,14 @@ from invenio_pidstore.providers.datacite import DataCiteProvider
 from invenio_records_files.api import Record
 from invenio_search.api import RecordsSearch
 
-from zenodo.modules.records.minters import is_local_doi
-from zenodo.modules.records.serializers import datacite_v41
+# from zenodo.modules.records.minters import is_local_doi
+# from zenodo.modules.records.serializers import datacite_v41
 
 
 @shared_task(ignore_result=True, max_retries=6, default_retry_delay=10 * 60,
              rate_limit='100/m')
 def datacite_register(pid_value, record_uuid):
+    pass
     """Mint DOI and Concept DOI with DataCite.
 
     :param pid_value: Value of record PID, with pid_type='recid'.
@@ -50,42 +51,42 @@ def datacite_register(pid_value, record_uuid):
     :param record_uuid: Record Metadata UUID.
     :type record_uuid: str
     """
-    try:
-        record = Record.get_record(record_uuid)
-        # Bail out if not a Zenodo DOI.
-        if not is_local_doi(record['doi']):
-            return
+    # try:
+    #     record = Record.get_record(record_uuid)
+    #     # Bail out if not a Zenodo DOI.
+    #     # if not is_local_doi(record['doi']):
+    #         # return
 
-        dcp = DataCiteProvider.get(record['doi'])
-        doc = datacite_v41.serialize(dcp.pid, record)
+    #     dcp = DataCiteProvider.get(record['doi'])
+    #     doc = datacite_v41.serialize(dcp.pid, record)
 
-        url = current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(
-            recid=pid_value)
-        if dcp.pid.status == PIDStatus.REGISTERED:
-            dcp.update(url, doc)
-        else:
-            dcp.register(url, doc)
+    #     url = current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(
+    #         recid=pid_value)
+    #     if dcp.pid.status == PIDStatus.REGISTERED:
+    #         dcp.update(url, doc)
+    #     else:
+    #         dcp.register(url, doc)
 
-        # If this is the latest record version, update/register the Concept DOI
-        # using the metadata of the record.
-        recid = PersistentIdentifier.get('recid', str(record['recid']))
-        pv = PIDVersioning(child=recid)
-        conceptdoi = record.get('conceptdoi')
-        if conceptdoi and pv.exists and pv.is_last_child:
-            conceptrecid = record.get('conceptrecid')
-            concept_dcp = DataCiteProvider.get(conceptdoi)
-            url = current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(
-                recid=conceptrecid)
+    #     # If this is the latest record version, update/register the Concept DOI
+    #     # using the metadata of the record.
+    #     recid = PersistentIdentifier.get('recid', str(record['recid']))
+    #     pv = PIDVersioning(child=recid)
+    #     conceptdoi = record.get('conceptdoi')
+    #     if conceptdoi and pv.exists and pv.is_last_child:
+    #         conceptrecid = record.get('conceptrecid')
+    #         concept_dcp = DataCiteProvider.get(conceptdoi)
+    #         url = current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(
+    #             recid=conceptrecid)
 
-            doc = datacite_v41.serialize(concept_dcp.pid, record)
-            if concept_dcp.pid.status == PIDStatus.REGISTERED:
-                concept_dcp.update(url, doc)
-            else:
-                concept_dcp.register(url, doc)
+    #         doc = datacite_v41.serialize(concept_dcp.pid, record)
+    #         if concept_dcp.pid.status == PIDStatus.REGISTERED:
+    #             concept_dcp.update(url, doc)
+    #         else:
+    #             concept_dcp.register(url, doc)
 
-        db.session.commit()
-    except Exception as exc:
-        datacite_register.retry(exc=exc)
+    #     db.session.commit()
+    # except Exception as exc:
+    #     datacite_register.retry(exc=exc)
 
 
 @shared_task(ignore_result=True, max_retries=6, default_retry_delay=10 * 60,

@@ -43,12 +43,12 @@ from six import string_types, text_type
 from werkzeug.local import LocalProxy
 from werkzeug.routing import PathConverter
 
-from zenodo.modules.deposit.resolvers import deposit_resolver
-from zenodo.modules.deposit.tasks import datacite_inactivate, datacite_register
-from zenodo.modules.openaire.helpers import openaire_datasource_id, \
-    openaire_original_id, openaire_type
-from zenodo.modules.openaire.tasks import openaire_delete
-from zenodo.modules.records.api import ZenodoRecord
+# from zenodo.modules.deposit.resolvers import deposit_resolver
+# from zenodo.modules.deposit.tasks import datacite_inactivate, datacite_register
+# from zenodo.modules.openaire.helpers import openaire_datasource_id, \
+    # openaire_original_id, openaire_type
+# from zenodo.modules.openaire.tasks import openaire_delete
+# from zenodo.modules.records.api import ZenodoRecord
 
 
 def file_id_to_key(value):
@@ -117,102 +117,102 @@ def delete_record(record_uuid, reason, user):
     :param user: ID or email of the Zenodo user (admin)
         responsible for the removal.
     """
-    from invenio_github.models import ReleaseStatus
-    if isinstance(user, text_type):
-        user_id = User.query.filter_by(email=user).one().id
-    elif isinstance(user, int):
-        user_id = User.query.get(user).id
-    else:
-        raise TypeError("User cannot be determined from argument: {0}".format(
-            user))
+    # from invenio_github.models import ReleaseStatus
+    # if isinstance(user, text_type):
+    #     user_id = User.query.filter_by(email=user).one().id
+    # elif isinstance(user, int):
+    #     user_id = User.query.get(user).id
+    # else:
+    #     raise TypeError("User cannot be determined from argument: {0}".format(
+    #         user))
 
-    record = ZenodoRecord.get_record(record_uuid)
+    # record = ZenodoRecord.get_record(record_uuid)
 
-    # Remove the record from versioning and delete the recid
-    recid = PersistentIdentifier.get('recid', record['recid'])
-    pv = PIDVersioning(child=recid)
-    pv.remove_child(recid)
-    pv.update_redirect()
-    recid.delete()
+    # # Remove the record from versioning and delete the recid
+    # recid = PersistentIdentifier.get('recid', record['recid'])
+    # pv = PIDVersioning(child=recid)
+    # pv.remove_child(recid)
+    # pv.update_redirect()
+    # recid.delete()
 
-    # Remove the record from index
-    try:
-        RecordIndexer().delete(record)
-    except NotFoundError:
-        pass
+    # # Remove the record from index
+    # try:
+    #     RecordIndexer().delete(record)
+    # except NotFoundError:
+    #     pass
 
-    # Remove buckets
-    record_bucket = record.files.bucket
-    RecordsBuckets.query.filter_by(record_id=record.id).delete()
-    record_bucket.locked = False
-    record_bucket.remove()
+    # # Remove buckets
+    # record_bucket = record.files.bucket
+    # RecordsBuckets.query.filter_by(record_id=record.id).delete()
+    # record_bucket.locked = False
+    # record_bucket.remove()
 
-    removal_reasons = dict(current_app.config['ZENODO_REMOVAL_REASONS'])
-    if reason in removal_reasons:
-        reason = removal_reasons[reason]
+    # removal_reasons = dict(current_app.config['ZENODO_REMOVAL_REASONS'])
+    # if reason in removal_reasons:
+    #     reason = removal_reasons[reason]
 
-    depid, deposit = deposit_resolver.resolve(record['_deposit']['id'])
+    # depid, deposit = deposit_resolver.resolve(record['_deposit']['id'])
 
-    try:
-        doi = PersistentIdentifier.get('doi', record['doi'])
-    except PIDDoesNotExistError:
-        doi = None
+    # try:
+    #     doi = PersistentIdentifier.get('doi', record['doi'])
+    # except PIDDoesNotExistError:
+    #     doi = None
 
-    # Record OpenAIRE info
-    try:
-        original_id = openaire_original_id(record, openaire_type(record))[1]
-        datasource_id = openaire_datasource_id(record)
-    except PIDDoesNotExistError:
-        original_id = None
-        datasource_id = None
+    # # Record OpenAIRE info
+    # try:
+    #     original_id = openaire_original_id(record, openaire_type(record))[1]
+    #     datasource_id = openaire_datasource_id(record)
+    # except PIDDoesNotExistError:
+    #     original_id = None
+    #     datasource_id = None
 
-    if pv.children.count() == 0:
-        conceptrecid = PersistentIdentifier.get('recid',
-                                                record['conceptrecid'])
-        conceptrecid.delete()
-        new_last_child = None
-    else:
-        new_last_child = (pv.last_child.pid_value,
-                          str(pv.last_child.object_uuid))
+    # if pv.children.count() == 0:
+    #     conceptrecid = PersistentIdentifier.get('recid',
+    #                                             record['conceptrecid'])
+    #     conceptrecid.delete()
+    #     new_last_child = None
+    # else:
+    #     new_last_child = (pv.last_child.pid_value,
+    #                       str(pv.last_child.object_uuid))
 
-    if 'conceptdoi' in record:
-        conceptdoi_value = record['conceptdoi']
-    else:
-        conceptdoi_value = None
+    # if 'conceptdoi' in record:
+    #     conceptdoi_value = record['conceptdoi']
+    # else:
+    #     conceptdoi_value = None
 
-    # Completely delete the deposit
-    # Deposit will be removed from index
-    deposit.delete(delete_published=True)
+    # # Completely delete the deposit
+    # # Deposit will be removed from index
+    # deposit.delete(delete_published=True)
 
-    # Clear the record and put the deletion information
-    record.clear()
-    record.update({
-        'removal_reason': reason,
-        'removed_by': user_id,
-    })
-    record.commit()
+    # # Clear the record and put the deletion information
+    # record.clear()
+    # record.update({
+    #     'removal_reason': reason,
+    #     'removed_by': user_id,
+    # })
+    # record.commit()
 
-    # Mark the relevant GitHub Release as deleted
-    for ghr in record.model.github_releases:
-        ghr.status = ReleaseStatus.DELETED
+    # # Mark the relevant GitHub Release as deleted
+    # for ghr in record.model.github_releases:
+    #     ghr.status = ReleaseStatus.DELETED
 
-    db.session.commit()
+    # db.session.commit()
 
-    # After successful DB commit, sync the DOIs with DataCite
-    datacite_inactivate.delay(doi.pid_value)
-    if conceptdoi_value:
-        if new_last_child:
-            # Update last child (updates also conceptdoi)
-            pid_value, rec_uuid = new_last_child
-            datacite_register.delay(pid_value, rec_uuid)
-        else:
-            datacite_inactivate.delay(conceptdoi_value)
+    # # After successful DB commit, sync the DOIs with DataCite
+    # datacite_inactivate.delay(doi.pid_value)
+    # if conceptdoi_value:
+    #     if new_last_child:
+    #         # Update last child (updates also conceptdoi)
+    #         pid_value, rec_uuid = new_last_child
+    #         datacite_register.delay(pid_value, rec_uuid)
+    #     else:
+    #         datacite_inactivate.delay(conceptdoi_value)
 
-    # Also delete from OpenAIRE index
-    if current_app.config['OPENAIRE_DIRECT_INDEXING_ENABLED'] and original_id \
-            and datasource_id:
-        openaire_delete.delay(original_id=original_id,
-                              datasource_id=datasource_id)
+    # # Also delete from OpenAIRE index
+    # if current_app.config['OPENAIRE_DIRECT_INDEXING_ENABLED'] and original_id \
+    #         and datasource_id:
+    #     openaire_delete.delay(original_id=original_id,
+    #                           datasource_id=datasource_id)
 
 
 def suggest_language(q, limit=5):

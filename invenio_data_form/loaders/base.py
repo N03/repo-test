@@ -28,7 +28,7 @@ from __future__ import absolute_import, print_function
 
 from flask import current_app, has_request_context, request
 
-from zenodo.modules.records.minters import doi_generator
+# from zenodo.modules.records.minters import doi_generator
 
 from ..errors import MarshmallowErrors
 
@@ -64,7 +64,8 @@ def marshmallow_loader(schema_class, **kwargs):
             if record.has_minted_doi() or record.get('conceptdoi'):
                 context['required_doi'] = record['doi']
             elif not record.is_published():
-                context['allowed_dois'] = [doi_generator(record['recid'])]
+                # context['allowed_dois'] = [doi_generator(record['recid'])]
+                context['allowed_dois'] = [record['recid']]
             else:
                 # Ensure we cannot change to e.g. empty string.
                 context['doi_required'] = True

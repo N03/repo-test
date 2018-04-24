@@ -28,13 +28,13 @@
 from flask import abort
 from flask_security import current_user
 
-from zenodo.modules.records.query import \
-    search_factory as record_search_factory
+# from zenodo.modules.records.query import \
+    # search_factory as record_search_factory
 
 
 def search_factory(*args, **kwargs):
     """Check user is logged in and then parse."""
     if not current_user.is_authenticated:
         abort(401)
-
-    return record_search_factory(*args, **kwargs)
+    pass
+    # return record_search_factory(*args, **kwargs)
