@@ -33,18 +33,18 @@ from flask import Blueprint, abort, current_app, flash, redirect, \
     render_template, request, url_for
 from flask_babelex import gettext as _
 from flask_security import current_user, login_required
-# from invenio_accounts.models import User
-# from invenio_communities.models import Community
-# from invenio_db import db
-# from invenio_pidrelations.contrib.versioning import PIDVersioning
-# from invenio_pidstore.errors import PIDDeletedError, PIDDoesNotExistError
-# from invenio_pidstore.models import PersistentIdentifier
-# from invenio_pidstore.resolver import Resolver
-# from invenio_records_ui.signals import record_viewed
+from invenio_accounts.models import User
+from invenio_communities.models import Community
+from invenio_db import db
+from invenio_pidrelations.contrib.versioning import PIDVersioning
+from invenio_pidstore.errors import PIDDeletedError, PIDDoesNotExistError
+from invenio_pidstore.models import PersistentIdentifier
+from invenio_pidstore.resolver import Resolver
+from invenio_records_ui.signals import record_viewed
 
-# from zenodo.modules.deposit.utils import delete_record
-# from zenodo.modules.openaire import current_openaire
-# from zenodo.modules.records.permissions import record_permission_factory
+from zenodo.modules.deposit.utils import delete_record
+from zenodo.modules.openaire import current_openaire
+from zenodo.modules.records.permissions import record_permission_factory
 
 from .api import ZenodoDeposit
 from .fetchers import zenodo_deposit_fetcher
