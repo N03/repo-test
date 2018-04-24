@@ -116,90 +116,90 @@ def new():
                            record={'_deposit': {'id': None}}, community=c)
 
 
-@blueprint.route(
-    '/record/<pid(recid,record_class='
-    '"zenodo.modules.records.api:ZenodoRecord"):pid_value>',
-    methods=['POST']
-)
-@login_required
-@pass_record('update')
-def edit(pid=None, record=None, depid=None, deposit=None):
-    """Edit a record."""
-    # If the record doesn't have a DOI, its deposit shouldn't be editable.
-    if 'doi' not in record:
-        abort(404)
+# @blueprint.route(
+#     '/record/<pid(recid,record_class='
+#     '"zenodo.modules.records.api:ZenodoRecord"):pid_value>',
+#     methods=['POST']
+# )
+# @login_required
+# @pass_record('update')
+# def edit(pid=None, record=None, depid=None, deposit=None):
+#     """Edit a record."""
+#     # If the record doesn't have a DOI, its deposit shouldn't be editable.
+#     if 'doi' not in record:
+#         abort(404)
 
-    return redirect(url_for(
-        'invenio_deposit_ui.{0}'.format(depid.pid_type),
-        pid_value=depid.pid_value
-    ))
-
-
-@blueprint.route(
-    '/record/<pid(recid,record_class='
-    '"zenodo.modules.records.api:ZenodoRecord"):pid_value>'
-    '/newversion',
-    methods=['POST']
-)
-@login_required
-@pass_record('newversion')
-def newversion(pid=None, record=None, depid=None, deposit=None):
-    """Create a new version of a record."""
-    # If the record doesn't have a DOI, its deposit shouldn't be editable.
-    if 'doi' not in record:
-        abort(404)
-
-    # FIXME: Maybe this has to go inside the API (`ZenodoDeposit.newversion`)
-    # If this is not the latest version, get the latest and extend it
-    latest_pid = PIDVersioning(child=pid).last_child
-    if pid != latest_pid:
-        # We still want to do a POST, so we specify a 307 reidrect code
-        return redirect(url_for('zenodo_deposit.newversion',
-                                pid_value=latest_pid.pid_value), code=307)
-
-    deposit.newversion()
-    db.session.commit()
-
-    new_version_deposit = PIDVersioning(child=pid).draft_child_deposit
-
-    return redirect(url_for(
-        'invenio_deposit_ui.{0}'.format(new_version_deposit.pid_type),
-        pid_value=new_version_deposit.pid_value
-    ))
+#     return redirect(url_for(
+#         'invenio_deposit_ui.{0}'.format(depid.pid_type),
+#         pid_value=depid.pid_value
+#     ))
 
 
-@blueprint.route(
-    '/record/<pid(recid,record_class='
-    '"zenodo.modules.records.api:ZenodoRecord"):pid_value>'
-    '/registerconceptdoi',
-    methods=['POST']
-)
-@login_required
-@pass_record('registerconceptdoi')
-def registerconceptdoi(pid=None, record=None, depid=None, deposit=None):
-    """Register the Concept DOI for the record."""
-    # If the record doesn't have a DOI, its deposit shouldn't be editable.
-    if 'conceptdoi' in record:
-        abort(404)  # TODO: Abort with better code if record is versioned
+# @blueprint.route(
+#     '/record/<pid(recid,record_class='
+#     '"zenodo.modules.records.api:ZenodoRecord"):pid_value>'
+#     '/newversion',
+#     methods=['POST']
+# )
+# @login_required
+# @pass_record('newversion')
+# def newversion(pid=None, record=None, depid=None, deposit=None):
+#     """Create a new version of a record."""
+#     # If the record doesn't have a DOI, its deposit shouldn't be editable.
+#     if 'doi' not in record:
+#         abort(404)
 
-    deposit.registerconceptdoi()
-    db.session.commit()
+#     # FIXME: Maybe this has to go inside the API (`ZenodoDeposit.newversion`)
+#     # If this is not the latest version, get the latest and extend it
+#     latest_pid = PIDVersioning(child=pid).last_child
+#     if pid != latest_pid:
+#         # We still want to do a POST, so we specify a 307 reidrect code
+#         return redirect(url_for('zenodo_deposit.newversion',
+#                                 pid_value=latest_pid.pid_value), code=307)
 
-    return redirect(url_for('invenio_records_ui.recid',
-                    pid_value=pid.pid_value))
+#     deposit.newversion()
+#     db.session.commit()
+
+#     new_version_deposit = PIDVersioning(child=pid).draft_child_deposit
+
+#     return redirect(url_for(
+#         'invenio_deposit_ui.{0}'.format(new_version_deposit.pid_type),
+#         pid_value=new_version_deposit.pid_value
+#     ))
 
 
-@blueprint.route(
-    '/record'
-    '/<pid(recid,record_class='
-    '"zenodo.modules.records.api:ZenodoRecord"):pid_value>'
-    '/admin/delete',
-    methods=['GET', 'POST']
-)
-@login_required
-@pass_record('delete')
-def delete(pid=None, record=None, depid=None, deposit=None):
-    pass
+# @blueprint.route(
+#     '/record/<pid(recid,record_class='
+#     '"zenodo.modules.records.api:ZenodoRecord"):pid_value>'
+#     '/registerconceptdoi',
+#     methods=['POST']
+# )
+# @login_required
+# @pass_record('registerconceptdoi')
+# def registerconceptdoi(pid=None, record=None, depid=None, deposit=None):
+#     """Register the Concept DOI for the record."""
+#     # If the record doesn't have a DOI, its deposit shouldn't be editable.
+#     if 'conceptdoi' in record:
+#         abort(404)  # TODO: Abort with better code if record is versioned
+
+#     deposit.registerconceptdoi()
+#     db.session.commit()
+
+#     return redirect(url_for('invenio_records_ui.recid',
+#                     pid_value=pid.pid_value))
+
+
+# @blueprint.route(
+#     '/record'
+#     '/<pid(recid,record_class='
+#     '"zenodo.modules.records.api:ZenodoRecord"):pid_value>'
+#     '/admin/delete',
+#     methods=['GET', 'POST']
+# )
+# @login_required
+# @pass_record('delete')
+# def delete(pid=None, record=None, depid=None, deposit=None):
+#     pass
     # """Delete a record."""
     # # View disabled until properly implemented and tested.
     # try:
